@@ -1,0 +1,7 @@
+{
+  "name": "Shingaku SmartTracker",
+  "description": "一个全面的人工智能平台，用于导航日本研究生院的入学申请，具有专业匹配、招生简章追踪、研究工具和个性化学习规划功能。",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
