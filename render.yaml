@@ -1,0 +1,77 @@
+services:
+  - type: web
+    name: daily-stock-analysis-web
+    runtime: docker
+    rootDir: daily_stock_analysis
+    dockerfilePath: ./daily_stock_analysis/docker/Dockerfile
+    dockerContext: ./daily_stock_analysis
+    plan: free
+    branch: main
+    healthCheckPath: /api/health
+    autoDeploy: true
+    disk:
+      name: daily-stock-analysis-data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: WEBUI_HOST
+        value: "0.0.0.0"
+      - key: DATABASE_PATH
+        value: /app/data/stock_analysis.db
+      - key: LOG_DIR
+        value: /app/logs
+      - key: REPORT_TYPE
+        value: simple
+      - key: MARKET_REVIEW_REGION
+        value: us
+      - key: STOCK_LIST
+        value: GOOGL,META,NVDA,AAPL
+      - key: TZ
+        value: Asia/Tokyo
+      - key: TRADING_DAY_CHECK_ENABLED
+        value: "true"
+      - key: MARKET_REVIEW_ENABLED
+        value: "true"
+      - key: SINGLE_STOCK_NOTIFY
+        value: "false"
+      - key: CORS_ALLOW_ALL
+        value: "true"
+      - key: EMAIL_RECEIVERS
+        value: xuboyan0823@gmail.com
+      - key: EMAIL_SENDER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: AIHUBMIX_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_BASE_URL
+        sync: false
+      - key: OPENAI_MODEL
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        sync: false
+      - key: TAVILY_API_KEYS
+        sync: false
+      - key: SERPAPI_API_KEYS
+        sync: false
+      - key: BOCHA_API_KEYS
+        sync: false
+      - key: WECHAT_WEBHOOK_URL
+        sync: false
+      - key: FEISHU_WEBHOOK_URL
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: DISCORD_WEBHOOK_URL
+        sync: false
+    dockerCommand: bash -lc 'python main.py --serve-only --host 0.0.0.0 --port ${PORT:-10000}'
