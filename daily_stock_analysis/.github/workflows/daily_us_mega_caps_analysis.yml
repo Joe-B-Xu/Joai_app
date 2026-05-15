@@ -58,6 +58,41 @@ jobs:
         run: |
           mkdir -p data logs reports
 
+      - name: Validate workflow configuration
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AIHUBMIX_KEY: ${{ secrets.AIHUBMIX_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EMAIL_SENDER: ${{ vars.EMAIL_SENDER || secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECEIVERS: ${{ vars.EMAIL_RECEIVERS || secrets.EMAIL_RECEIVERS || 'xuboyan0823@gmail.com' }}
+          STOCK_LIST: ${{ github.event.inputs.stock_list || 'GOOGL,META,NVDA,AAPL' }}
+        run: |
+          set -e
+
+          if [ -z "$GEMINI_API_KEY" ] && [ -z "$AIHUBMIX_KEY" ] && [ -z "$OPENAI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::No AI provider key is configured. Set at least one of GEMINI_API_KEY, AIHUBMIX_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY in GitHub Secrets."
+            exit 1
+          fi
+
+          if [ -z "$EMAIL_SENDER" ] || [ -z "$EMAIL_PASSWORD" ]; then
+            echo "::error::Email delivery is not fully configured. Set EMAIL_SENDER and EMAIL_PASSWORD in GitHub repository variables/secrets."
+            exit 1
+          fi
+
+          if [ -z "$EMAIL_RECEIVERS" ]; then
+            echo "::error::EMAIL_RECEIVERS is empty."
+            exit 1
+          fi
+
+          if [ -z "$STOCK_LIST" ]; then
+            echo "::error::STOCK_LIST is empty."
+            exit 1
+          fi
+
+          echo "Workflow preflight checks passed."
+
       - name: Run daily US stock analysis
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
